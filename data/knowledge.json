@@ -1,0 +1,14 @@
+{
+  "plans": {
+    "basic": "The Basic plan costs $10/month and includes standard support, 5GB storage, and single-user access.",
+    "pro": "The Pro plan is $25/month and offers 24/7 priority support, 50GB storage, advanced analytics, and access for up to 5 users.",
+    "enterprise": "The Enterprise plan offers custom pricing. It includes unlimited storage, dedicated account manager, SSO integration, and unlimited users."
+  },
+  "policies": {
+    "refund": "We offer a 30-day money-back guarantee on all our paid plans. If you are not satisfied, contact support within 30 days of purchase for a full refund.",
+    "cancellation": "You can cancel your subscription at any time through your account dashboard. You will retain access until the end of the current billing cycle."
+  },
+  "general": {
+    "about": "We provide AI-powered intent classifier agents that help automate your customer lead capture workflows effortlessly."
+  }
+}
