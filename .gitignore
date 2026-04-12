@@ -11,6 +11,7 @@ wheels/
 
 #environment variables
 .env
+app.py
 
 lead_workflow.ipynb
 

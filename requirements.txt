@@ -5,9 +5,6 @@ sentence-transformers
 faiss-cpu
 chromadb
 python-dotenv
-langchain_openai
-openai
 langchain_community 
 langchain_groq
 langchain_huggingface
-langchain_google_genai

@@ -3,6 +3,9 @@ from dotenv import load_dotenv
 from langchain_core.messages import HumanMessage
 from agent.graph import compile_graph
 
+import warnings
+warnings.filterwarnings("ignore")
+
 # Load environment variables (e.g. OPENAI_API_KEY)
 load_dotenv()
 
