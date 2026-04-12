@@ -1,6 +1,7 @@
 import json
 import os
-from langchain_google_genai import GoogleGenerativeAIEmbeddings, ChatGoogleGenerativeAI
+from langchain_groq import ChatGroq
+from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_core.documents import Document
 from langchain_core.messages import AIMessage, SystemMessage
@@ -27,7 +28,7 @@ def get_vectorstore():
         else:
             docs.append(Document(page_content=content, metadata={"category": category}))
             
-    embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
+    embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
     vectorstore = FAISS.from_documents(docs, embeddings)
     return vectorstore
 
@@ -43,7 +44,7 @@ def rag_node(state: AgentState) -> dict:
     retrieved_docs = vs.similarity_search(latest_query, k=3)
     context = "\n".join([doc.page_content for doc in retrieved_docs])
     
-    llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0)
+    llm = ChatGroq(model="openai/gpt-oss-20b", temperature=0)
     
     system_prompt = (
         "You are a helpful assistant for a company. Use the following context to answer the user's query.\n"

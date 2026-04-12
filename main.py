@@ -15,11 +15,11 @@ def print_messages(messages):
         print(f"\nAgent: {last_msg.content}")
 
 def main():
-    print("Welcome to Inte-agent! Type 'quit' to exit.")
+    print("Welcome to Autostream-agent! Type 'quit' to exit.")
     
-    # Needs GOOGLE_API_KEY
-    if not os.getenv("GOOGLE_API_KEY"):
-        print("Warning: GOOGLE_API_KEY not found in environment! Gemini features will fail.")
+    # Needs GROQ_API_KEY
+    if not os.getenv("GROQ_API_KEY"):
+        print("Warning: GROQ_API_KEY not found in environment! Groq features will fail.")
         
     app = compile_graph()
     

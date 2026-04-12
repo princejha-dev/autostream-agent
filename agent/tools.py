@@ -1,4 +1,4 @@
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_groq import ChatGroq
 from langchain_core.messages import SystemMessage, AIMessage
 from pydantic import BaseModel, Field
 from .state import AgentState
@@ -15,13 +15,16 @@ def mock_lead_capture(name: str, email: str, platform: str):
 def collect_info_node(state: AgentState) -> dict:
     """Extracts user info and asks for missing data."""
     messages = state.get("messages", [])
-    user_data = state.get("user_data", {})
-    
-    if not user_data:
+    if not state.get("user_data"):
         user_data = {"name": None, "email": None, "platform": None}
+    else:
+        user_data = state["user_data"]
+        
+    if all(user_data.values()):
+        return {"user_data": user_data}
     
     # Extract data from the conversation
-    llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0)
+    llm = ChatGroq(model="openai/gpt-oss-20b", temperature=0)
     extractor = llm.with_structured_output(UserInfoExtraction)
     
     system_prompt = (
@@ -47,7 +50,7 @@ def collect_info_node(state: AgentState) -> dict:
         # Prompt for the first missing field
         next_missing = missing_fields[0]
         if next_missing == "name":
-            msg = "Great! To get you started, could I please have your name?"
+            msg = "Awesome choice! Let's get you set up. What's your name?"
         elif next_missing == "email":
             name_ref = user_data.get("name", "there")
             msg = f"Thanks {name_ref}! What is your email address?"
@@ -65,6 +68,11 @@ def collect_info_node(state: AgentState) -> dict:
         }
 
 def tool_node(state: AgentState) -> dict:
+    if state.get("lead_collected"):
+        return {
+            "messages": [AIMessage(content="Your details are already captured.")]
+        }
+        
     user_data = state.get("user_data", {})
     name = user_data.get("name")
     email = user_data.get("email")

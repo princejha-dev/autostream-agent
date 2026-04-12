@@ -1,4 +1,4 @@
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_groq import ChatGroq
 from langchain_core.messages import SystemMessage
 from pydantic import BaseModel, Field
 import os
@@ -13,10 +13,14 @@ def detect_intent(state: AgentState) -> dict:
     Node to detect the intent of the user.
     Uses ChatOpenAI to process the latest messages and classify the intent.
     """
+    # If it's already high intent, keep it without invoking the LLM again.
+    if state.get("is_high_intent") or state.get("intent") == "high_intent":
+        return {"intent": "high_intent", "is_high_intent": True}
+
     messages = state.get("messages", [])
     
     # We only need the conversation context and the last user message to determine intent
-    llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0)
+    llm = ChatGroq(model="openai/gpt-oss-20b", temperature=0)
     structured_llm = llm.with_structured_output(IntentClassification)
     
     system_prompt = (
@@ -31,10 +35,7 @@ def detect_intent(state: AgentState) -> dict:
     
     classification = structured_llm.invoke([SystemMessage(content=system_prompt)] + messages)
     
-    # If it's already high intent, keep it.
-    if state.get("is_high_intent"):
-        return {"intent": "high_intent", "is_high_intent": True}
-        
+
     return {
         "intent": classification.intent,
         "is_high_intent": classification.is_high_intent
