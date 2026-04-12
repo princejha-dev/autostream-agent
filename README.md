@@ -40,45 +40,53 @@ Stored locally and includes:
   * 24/7 support only on Pro plan
 
 ## Project Structure
+
 ```text
-agent/
-  graph.py
-  intent.py
-  rag.py
-  state.py
-  tools.py
-
-asset/
-  workflow.png
-
-data/
-  knowledge.json
-
-.env.example
-.gitignore
-main.py
-pyproject.toml
-requirements.txt
-uv.lock
-README.md
+.
+├── agent/
+│   ├── graph.py        # LangGraph workflow definition
+│   ├── intent.py       # Intent detection logic
+│   ├── rag.py          # RAG pipeline (FAISS + embeddings)
+│   ├── state.py        # State schema and management
+│   └── tools.py        # Mock lead capture tool
+│
+├── data/
+│   └── knowledge.json  # Pricing and policy knowledge base
+│
+├── asset/
+│   └── workflow.png    # Graph visualization image
+│
+├── main.py             # CLI entry point
+├── requirements.txt    # Python dependencies
+├── pyproject.toml      # Project configuration (uv)
+├── uv.lock             # Locked dependency versions
+├── .env.example        # Environment variables template
+├── .gitignore
+└── README.md
 ```
 
 ## Workflow Graph
 ![Workflow Graph](asset/workflow.png)
 
+### Node Flow
+
+```text
 The flow of the LangGraph nodes:
 
-START -> detect_intent
--> greeting_node (if greeting)
--> rag_node (if product query)
--> check_user_data (if high intent)
+START
+  ↓
+detect_intent
+  ├── greeting_node       (if greeting)
+  ├── rag_node            (if product query)
+  └── check_user_data     (if high intent)
 
 check_user_data
--> collect_info (if data missing)
--> tool_node (if all data collected)
+  ├── collect_info        (if data missing)
+  └── tool_node           (if all data collected)
 
-collect_info -> END
-tool_node -> END
+collect_info → END
+tool_node    → END
+```
 
 This graph ensures proper routing through conditional edges. By evaluating the session state at `check_user_data`, the architecture prevents premature tool calls until all required properties (name, email, platform) are present. The flow terminates at `END` during `collect_info`, naturally passing control back to the user to pause and capture responses natively over a multi-turn conversation.
 
