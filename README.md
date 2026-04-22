@@ -3,6 +3,9 @@
 ## Short Description
 A stateful conversational AI agent that transforms user interactions into qualified leads using LangGraph, RAG, and tool execution.
 
+## Streamli UI
+![Streamli UI](asset/home_page.png)
+
 ## Tech Stack
 * Python 3.11
 * LangGraph + LangChain
@@ -58,6 +61,7 @@ Stored locally and includes:
 │   └── workflow.png    # Graph visualization image
 │
 ├── main.py             # CLI entry point
+├── app.py              #streamlit web ui
 ├── requirements.txt    # Python dependencies
 ├── pyproject.toml      # Project configuration (uv)
 ├── uv.lock             # Locked dependency versions
@@ -94,11 +98,12 @@ This graph ensures proper routing through conditional edges. By evaluating the s
 ## Installation
 
 ### Prerequisites
-1. Get your OpenRouter API key from [OpenRouter.ai](https://openrouter.ai/)
-2. Copy `.env.example` to `.env` and add your API keys:
+1. Get your Google API key (Gemini) from [Google AI Studio](https://makersuite.google.com/app/apikey)
+2. Get your Groq API key from [Groq Console](https://console.groq.com/keys)
+3. Copy `.env.example` to `.env` and add your API keys:
    ```
    GROQ_API_KEY=your_groq_api_key_here
-   OPENROUTER_API_KEY=your_openrouter_api_key_here
+   GEMINI_API_KEY=your_google_gemini_api_key_here
    ```
 
 ```bash
@@ -125,12 +130,27 @@ uv run python main.py
 .venv\Scripts\python.exe main.py
 ```
 
+## Streamlit Web UI Features
+
+The Streamlit web application provides an intuitive interface with:
+
+- **Real-time Chat Interface**: Interactive multi-turn conversation with the AI agent
+- **Chat History**: View all previous exchanges in the conversation
+- **Sidebar Panel**: 
+  - About section explaining agent capabilities
+  - Clear chat history button for fresh conversations
+  - Conversation metrics (message count, detected intent)
+- **Lead Information Display**: Automatic capture and display of user information (name, email, platform)
+- **Success Notifications**: Visual feedback when lead collection is completed
+- **Error Handling**: Clear error messages with guidance on required API keys
+- **Responsive Design**: Works seamlessly on desktop and mobile browsers
+
 ## Architecture Explanation
 The application relies heavily on LangGraph to manage cyclic, multi-turn stateful workflows, resolving the limitations of linear conversational chains. LangGraph allows the agent to iteratively loop through human-in-the-loop interactions without losing context or dropping entity data gathered in preceding steps.
 
 State is safely managed across conversational turns via an overarching State Dictionary. Variables such as `intent`, `is_high_intent`, and `user_data` natively persist across nodes. Because `is_high_intent` locks in a True value upon classification, the system avoids redundant context gathering and focuses strictly on information capture.
 
-The architecture elegantly links intent detection, RAG retrieval, and tool execution as independent nodes governed by LangGraph edges. Incoming queries initially hit the intent detection node utilizing Groq's Large Language Models to classify interaction structure. Routine inquiries branch off to the RAG node where FAISS and Google Gemini embeddings via OpenRouter fetch localized policies and gracefully exit. Deep-intent patterns are shifted to a dedicated collection boundary that seamlessly intercepts conversations to aggregate data before dispatching the final lead payload APIs securely.
+The architecture elegantly links intent detection, RAG retrieval, and tool execution as independent nodes governed by LangGraph edges. Incoming queries initially hit the intent detection node utilizing Groq's Large Language Models to classify interaction structure. Routine inquiries branch off to the RAG node where FAISS and Google Gemini embeddings fetch localized policies and gracefully exit. Deep-intent patterns are shifted to a dedicated collection boundary that seamlessly intercepts conversations to aggregate data before dispatching the final lead payload APIs securely.
 
 ## WhatsApp Integration
 This agent can be integrated directly utilizing WhatsApp Webhooks through services such as the Twilio API or Meta Business API. 
