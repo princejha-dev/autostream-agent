@@ -7,9 +7,10 @@ A stateful conversational AI agent that transforms user interactions into qualif
 * Python 3.11
 * LangGraph + LangChain
 * Groq (LLM)
-* HuggingFace Embeddings (all-MiniLM-L6-v2)
+* Google Gemini Embedding 001 (embeddings)
 * FAISS (vector store)
 * uv (package manager)
+* Streamlit (web UI)
 
 ## Project Description
 This project implements a conversational AI agent for a fictional SaaS product "AutoStream". 
@@ -92,14 +93,36 @@ This graph ensures proper routing through conditional edges. By evaluating the s
 
 ## Installation
 
+### Prerequisites
+1. Get your OpenRouter API key from [OpenRouter.ai](https://openrouter.ai/)
+2. Copy `.env.example` to `.env` and add your API keys:
+   ```
+   GROQ_API_KEY=your_groq_api_key_here
+   OPENROUTER_API_KEY=your_openrouter_api_key_here
+   ```
+
 ```bash
 uv pip install -r requirements.txt
 ```
 
 ## Running the Application
 
+### Streamlit Web App
 ```bash
+# Using uv
+uv run streamlit run app.py
+
+# Using venv
+.venv\Scripts\python.exe -m streamlit run app.py
+```
+
+### CLI Version
+```bash
+# Using uv
 uv run python main.py
+
+# Using venv
+.venv\Scripts\python.exe main.py
 ```
 
 ## Architecture Explanation
@@ -107,7 +130,7 @@ The application relies heavily on LangGraph to manage cyclic, multi-turn statefu
 
 State is safely managed across conversational turns via an overarching State Dictionary. Variables such as `intent`, `is_high_intent`, and `user_data` natively persist across nodes. Because `is_high_intent` locks in a True value upon classification, the system avoids redundant context gathering and focuses strictly on information capture.
 
-The architecture elegantly links intent detection, RAG retrieval, and tool execution as independent nodes governed by LangGraph edges. Incoming queries initially hit the intent detection node utilizing Groq's Large Language Models to classify interaction structure. Routine inquiries branch off to the RAG node where FAISS and HuggingFace fetch localized policies and gracefully exit. Deep-intent patterns are shifted to a dedicated collection boundary that seamlessly intercepts conversations to aggregate data before dispatching the final lead payload APIs securely.
+The architecture elegantly links intent detection, RAG retrieval, and tool execution as independent nodes governed by LangGraph edges. Incoming queries initially hit the intent detection node utilizing Groq's Large Language Models to classify interaction structure. Routine inquiries branch off to the RAG node where FAISS and Google Gemini embeddings via OpenRouter fetch localized policies and gracefully exit. Deep-intent patterns are shifted to a dedicated collection boundary that seamlessly intercepts conversations to aggregate data before dispatching the final lead payload APIs securely.
 
 ## WhatsApp Integration
 This agent can be integrated directly utilizing WhatsApp Webhooks through services such as the Twilio API or Meta Business API. 

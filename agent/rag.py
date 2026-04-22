@@ -1,10 +1,10 @@
 import json
 import os
 from langchain_groq import ChatGroq
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_core.documents import Document
-from langchain_core.messages import AIMessage, SystemMessage
+from langchain_core.messages import SystemMessage
 from .state import AgentState
 
 # Global variable to hold the vectorstore to avoid rebuilding every time
@@ -15,6 +15,7 @@ def get_vectorstore():
     if vectorstore is not None:
         return vectorstore
         
+    print("Building vectorstore... This may take a moment on first run.")
     knowledge_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "knowledge.json")
     with open(knowledge_path, "r", encoding="utf-8") as f:
         data = json.load(f)
@@ -27,9 +28,13 @@ def get_vectorstore():
                 docs.append(Document(page_content=f"{k}: {v}", metadata={"category": category, "topic": k}))
         else:
             docs.append(Document(page_content=content, metadata={"category": category}))
-            
-    embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+    
+    embeddings = GoogleGenerativeAIEmbeddings(
+        model="gemini-embedding-001",
+        google_api_key=os.getenv("GEMINI_API_KEY"),
+    )
     vectorstore = FAISS.from_documents(docs, embeddings)
+    print("Vectorstore built successfully.")
     return vectorstore
 
 def rag_node(state: AgentState) -> dict:

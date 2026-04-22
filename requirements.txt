@@ -1,10 +1,9 @@
 langchain
 langchain-core
 langgraph
-sentence-transformers
 faiss-cpu
 chromadb
 python-dotenv
 langchain_community 
 langchain_groq
-langchain_huggingface
+langchain-google-genai
